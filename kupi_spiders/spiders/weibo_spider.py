@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+#!/usr/bin/python # -*- coding: UTF-8 -*-
 import scrapy
 import json
 import MySQLdb
@@ -19,7 +18,8 @@ class WeiboSpider(scrapy.Spider):
 	    for line in uf:
 		index=line.find("page=1")
 		if index != -1 :
-		    self.start_urls.append(line[0:index+6])
+		    self.start_urls.append(line[0:index+5]+"1")
+		    self.start_urls.append(line[0:index+5]+"2")
 			
 
     def parse(self, response):
@@ -30,7 +30,9 @@ class WeiboSpider(scrapy.Spider):
         for card in cards:
 	    if card['card_type'] == 9:
 		resultDic = {}
+	        home = card['scheme']
 		mblog = card['mblog']
+		user = mblog['user']
 		user_blog_id = card['itemid']
 		blog_id = mblog['id']	
  		text  = mblog['text']
@@ -44,28 +46,37 @@ class WeiboSpider(scrapy.Spider):
 		    text = json.loads(res)['data']['longTextContent']
 
 		resultDic['type']=0
-		resultDic['text'] = text.replace("'","\\\\\'")
+		resultDic['home']=home
+		resultDic['text']=text.replace("'","\"")
+		resultDic['user']={}
+		resultDic['user']['name']=user['screen_name']
+		resultDic['user']['image']=user['profile_image_url']
 
 		if 'pics' in mblog:
 		    resultDic['type']=1
-		    resultDic['pics']=mblog['pics']	
-		if 'page_info' in mblog:
+		    resultDic['pics_info']=mblog['pics']	
+		elif 'page_info' in mblog and 'media_info' in mblog['page_info']:
 		    resultDic['type']=2
-		    resultDic['page_info']=mblog['page_info'] 
+		    resultDic['video_info']=mblog['page_info']
+		else:
+		    pass
 
 		resultJson = json.dumps(resultDic,ensure_ascii=False)
-		
-		print user_blog_id
-		sql = "INSERT INTO crawl_origin_data(\
+		print resultJson
+		select_sql = "SELECT COUNT(*) FROM crawl_origin_data \
+                              WHERE thirdid = '%s'" % user_blog_id 
+
+		insert_sql = "INSERT INTO crawl_origin_data(\
        		       thirdid, content, source, status) \
                        VALUES ('%s', '%s', '%d', '%d' )" % \
                        (user_blog_id,resultJson, 1,0)
-		
+
 		try:
-		    cursor.execute(sql)
-		    db.commit()
+		    cursor.execute(select_sql)
+		    if cursor.fetchone()[0]==0L :
+		        cursor.execute(insert_sql)
+	                db.commit()
 		except Exception, e:
-		    print "error,........."
 		    print e
 		    db.rollback()
 	db.close()
