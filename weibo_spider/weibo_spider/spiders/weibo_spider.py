@@ -72,6 +72,7 @@ class WeiboSpider(scrapy.Spider):
                        (user_blog_id,resultJson, 1,0)
 
 		try:
+		    print insert_sql
 		    cursor.execute(select_sql)
 		    if cursor.fetchone()[0]==0L :
 		        cursor.execute(insert_sql)

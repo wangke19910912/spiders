@@ -8,7 +8,7 @@
 import scrapy
 
 
-class KupiSpidersItem(scrapy.Item):
+class ZuiyouSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for kupi_spiders project
+# Scrapy settings for zuiyou_spider project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'kupi_spiders'
+BOT_NAME = 'zuiyou_spider'
 
-SPIDER_MODULES = ['kupi_spiders.spiders']
-NEWSPIDER_MODULE = 'kupi_spiders.spiders'
+SPIDER_MODULES = ['zuiyou_spider.spiders']
+NEWSPIDER_MODULE = 'zuiyou_spider.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'kupi_spiders (+http://www.yourdomain.com)'
+#USER_AGENT = 'zuiyou_spider (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -47,13 +47,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'kupi_spiders.middlewares.KupiSpidersSpiderMiddleware': 543,
+#    'zuiyou_spider.middlewares.ZuiyouSpiderSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'kupi_spiders.middlewares.KupiSpidersDownloaderMiddleware': 543,
+#    'zuiyou_spider.middlewares.ZuiyouSpiderDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -65,7 +65,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'kupi_spiders.pipelines.KupiSpidersPipeline': 300,
+#    'zuiyou_spider.pipelines.ZuiyouSpiderPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
