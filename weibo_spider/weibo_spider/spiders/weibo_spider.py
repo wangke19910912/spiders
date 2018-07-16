@@ -5,22 +5,28 @@ import MySQLdb
 import urllib
 import urllib2
 import sys
+import random
 
 class WeiboSpider(scrapy.Spider):
     name = "weibo"
     allowed_domains = ["weibo.cn"]
     start_urls = []
+    fake_user =[]
+    fake_user_size = 0
     headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'} 
 
-    def __init__(self, url_file=None, *args, **kwargs):
+    def __init__(self, url_file=None,username_file=None,*args, **kwargs):
         super(WeiboSpider, self).__init__(*args, **kwargs)
         with open(url_file) as uf:	
 	    for line in uf:
 		index=line.find("page=1")
 		if index != -1 :
-		    self.start_urls.append(line[0:index+5]+"1")
-		    self.start_urls.append(line[0:index+5]+"2")
-			
+		    for i in range(1,100):
+		        self.start_urls.append(line[0:index+5]+str(i))
+	with open(username_file) as uf:
+	    for line in uf:
+	        self.fake_user.append(line.decode('utf8'))
+		self.fake_user_size = self.fake_user_size + 1
 
     def parse(self, response):
 	db = MySQLdb.connect("39.104.94.203", "dboper", "DB2018kp!", "kp", charset='utf8' )
@@ -38,7 +44,6 @@ class WeiboSpider(scrapy.Spider):
  		text  = mblog['text']
 		if u"全文" in text:
 		    request_url = 'https://m.weibo.cn/statuses/extend?id=' + str(blog_id)
-		    print request_url
 		    req = urllib2.Request(request_url,headers=self.headers)
 		    res = urllib2.urlopen(req).read()
 		    #type = sys.getfilesystemencoding()	
@@ -48,9 +53,16 @@ class WeiboSpider(scrapy.Spider):
 		resultDic['type']=0
 		resultDic['home']=home
 		resultDic['text']=text.replace("'","\"")
+
+		#随机用户名
+		ran = random.randint(0,self.fake_user_size)
+		line_user = self.fake_user[ran].split(" ")
+		user_name = line_user[0]
+		user_pic = line_user[1]
+			
 		resultDic['user']={}
-		resultDic['user']['name']=user['screen_name']
-		resultDic['user']['image']=user['profile_image_url']
+		resultDic['user']['name']= user_name 
+		resultDic['user']['image']= user_pic
 
 		if 'pics' in mblog:
 		    resultDic['type']=1
@@ -62,7 +74,6 @@ class WeiboSpider(scrapy.Spider):
 		    pass
 
 		resultJson = json.dumps(resultDic,ensure_ascii=False)
-		print resultJson
 		select_sql = "SELECT COUNT(*) FROM crawl_origin_data \
                               WHERE thirdid = '%s'" % user_blog_id 
 
@@ -72,7 +83,6 @@ class WeiboSpider(scrapy.Spider):
                        (user_blog_id,resultJson, 1,0)
 
 		try:
-		    print insert_sql
 		    cursor.execute(select_sql)
 		    if cursor.fetchone()[0]==0L :
 		        cursor.execute(insert_sql)
