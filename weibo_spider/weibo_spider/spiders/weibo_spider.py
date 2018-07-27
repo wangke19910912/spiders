@@ -21,7 +21,7 @@ class WeiboSpider(scrapy.Spider):
 	    for line in uf:
 		index=line.find("page=1")
 		if index != -1 :
-		    for i in range(1,100):
+		    for i in range(1,120):
 		        self.start_urls.append(line[0:index+5]+str(i))
 	with open(username_file) as uf:
 	    for line in uf:
